@@ -551,26 +551,37 @@ dialog::backdrop { background: rgba(13, 27, 58, 0.7); }
 .wa-float span { display: none; }
 
 /* ----- Celular: Servicios en lista corta; Proyectos solo nombrados; Cómo trabajamos en línea de tiempo ----- */
-.only-mobile, .project-names, .service-list { display: none; }
+.only-mobile, .project-names, .service-list, .svc-dots { display: none; }
 @media (max-width: 899px) {
   .services { display: none; }
-  .service-list { display: grid; gap: 10px; list-style: none; margin: 0; padding: 0; }
+  /* Servicios: tarjetas grandes en horizontal que avanzan solas */
+  .service-list {
+    display: flex; gap: 12px; list-style: none; margin: 0 calc(var(--gutter) * -1); padding: 4px var(--gutter) 10px;
+    overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--gutter);
+    overscroll-behavior-x: contain; scrollbar-width: none;
+  }
+  .service-list::-webkit-scrollbar { display: none; }
+  .service-list li { flex: 0 0 82%; display: flex; scroll-snap-align: start; }
   .service-row {
-    display: flex; align-items: center; gap: 14px; padding: 16px 16px 16px 18px; text-decoration: none;
-    background: var(--white); border: 1.5px solid var(--line); border-radius: var(--r-m);
+    flex: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 14px;
+    min-height: 260px; padding: 26px 22px 24px; text-decoration: none;
+    background: var(--white); border: 1.5px solid var(--line); border-radius: var(--r-l); box-shadow: var(--sombra-1);
     transition: border-color .15s;
   }
   .service-row:hover, .service-row:active { border-color: var(--brand); }
-  .sr-text { flex: 1; min-width: 0; display: grid; gap: 4px; }
-  .sr-text strong { font-family: var(--f-head); font-size: 1.08rem; line-height: 1.2; }
-  .sr-text span {
-    color: var(--muted); font-size: .93rem; line-height: 1.4;
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-  }
-  .service-row svg {
-    flex: 0 0 auto; width: 38px; height: 38px; padding: 9px; border-radius: 50%;
-    background: var(--wa-soft); fill: none; stroke: var(--wa); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
-  }
+  .sr-num { font-family: var(--f-head); font-weight: 800; font-size: 2rem; line-height: 1; color: var(--pizarra-200); }
+  .sr-text { display: grid; gap: 8px; }
+  .sr-text strong { font-family: var(--f-head); font-size: 1.5rem; line-height: 1.15; letter-spacing: -0.02em; }
+  .sr-text span { color: var(--muted); font-size: 1.02rem; line-height: 1.45; }
+  .sr-cta { margin-top: auto; display: inline-flex; align-items: center; gap: 8px; color: var(--wa); font-weight: 700; }
+  .sr-cta svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .svc-dots { display: flex; gap: 6px; margin-top: 10px; }
+  .svc-dots button { flex: 1; max-width: 44px; height: 22px; padding: 0; border: 0; background: none; cursor: pointer; display: flex; align-items: center; }
+  .svc-dots span { display: block; width: 100%; height: 4px; border-radius: 4px; background: var(--puntada); transition: background-color .3s; }
+  .svc-dots [aria-current] span { background: var(--brand); }
+
+  /* Sin el desplegable del inicio ni las preguntas frecuentes: la página arranca en Servicios */
+  .hero-acc, #faq { display: none; }
 
   .only-desktop, .projects .filters, .project-grid { display: none; }
   .only-mobile { display: inline; }
@@ -580,6 +591,21 @@ dialog::backdrop { background: rgba(13, 27, 58, 0.7); }
     padding: 14px 16px; border-radius: var(--r-m); background: var(--ink-2); border: 1.5px solid var(--pizarra-700);
   }
   .pn-title { font-family: var(--f-head); font-weight: 700; font-size: 1.05rem; line-height: 1.25; }
+  .project-names li { gap: 4px; }
+  .project-names .chip {
+    order: 2; padding: 0; border-radius: 0; background: none; border: 0;
+    font-size: .9rem; font-weight: 500; color: var(--pizarra-300);
+  }
+
+  /* Footer corto: solo redes y copyright; íconos sin fondo */
+  .site-footer { padding: 28px var(--gutter) 22px; }
+  .footer-brand .brand, .footer-brand > p, .footer-col, .footer-bottom p:last-child { display: none; }
+  .footer-grid { gap: 0; }
+  .social { margin: 0; }
+  .social a { padding: 4px; border: 0; }
+  .social a svg { width: 30px; height: 30px; padding: 0; background: none; }
+  .social a:hover svg { background: none; color: var(--white); }
+  .footer-bottom { margin-top: 16px; padding: 14px 72px 0 0; }
 
   /* Línea de tiempo: los pasos unidos por un hilo punteado (la puntada de la marca) */
   .steps { gap: 14px; }

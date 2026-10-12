@@ -92,24 +92,81 @@
     renderServiceList();
   }
 
+  /* Celular: tarjetas grandes de servicios que avanzan solas en horizontal.
+     Se detienen para siempre cuando la persona toca o desliza (ya tomó el control). */
+  var svc = { idx: 0, stopped: false, visible: false };
+  var svcAuto = window.matchMedia("(max-width: 899px) and (prefers-reduced-motion: no-preference)");
+
   function renderServiceList() {
     var ul = $("#service-list");
+    var dots = $("#service-dots");
     ul.innerHTML = "";
-    DATA.servicios.forEach(function (s) {
+    dots.innerHTML = "";
+    DATA.servicios.forEach(function (s, i) {
       var titulo = pick(s.titulo, s.tituloVE);
       var li = document.createElement("li");
       li.innerHTML =
         "<a class='service-row' target='_blank' rel='noopener'>" +
+          "<span class='sr-num' aria-hidden='true'></span>" +
           "<span class='sr-text'><strong></strong><span></span></span>" +
-          "<svg viewBox='0 0 24 24' aria-hidden='true'><path d='M5 12h14m-6-6 6 6-6 6'/></svg>" +
+          "<span class='sr-cta'>Consultar por WhatsApp" +
+            "<svg viewBox='0 0 24 24' aria-hidden='true'><path d='M5 12h14m-6-6 6 6-6 6'/></svg></span>" +
         "</a>";
+      $(".sr-num", li).textContent = (i < 9 ? "0" : "") + (i + 1);
       $("strong", li).textContent = titulo;
       $(".sr-text span", li).textContent = pick(s.corto || s.resumen, s.cortoVE || s.corto);
       var a = $("a", li);
       a.href = waLink("Hola Ronald, me interesa «" + titulo + "». ¿Podemos conversar?");
       a.setAttribute("aria-label", titulo + ": consultar por WhatsApp");
       ul.appendChild(li);
+
+      var b = document.createElement("button");
+      b.type = "button";
+      b.setAttribute("aria-label", "Ver " + titulo);
+      b.innerHTML = "<span></span>";
+      b.addEventListener("click", function () { svc.stopped = true; svcGo(i); });
+      dots.appendChild(b);
     });
+    svcMark(svc.idx);
+  }
+
+  function svcItems() { return $$("#service-list li"); }
+
+  function svcMark(i) {
+    svc.idx = i;
+    $$("#service-dots button").forEach(function (b, j) {
+      if (j === i) b.setAttribute("aria-current", "true"); else b.removeAttribute("aria-current");
+    });
+  }
+
+  function svcGo(i) {
+    var track = $("#service-list"), items = svcItems();
+    if (!items.length) return;
+    i = (i + items.length) % items.length;
+    var pad = parseFloat(getComputedStyle(track).paddingLeft) || 0;
+    track.scrollTo({ left: items[i].offsetLeft - track.offsetLeft - pad, behavior: "smooth" });
+    svcMark(i);
+  }
+
+  function initServiceCarousel() {
+    var track = $("#service-list");
+    function stop() { svc.stopped = true; }
+    track.addEventListener("pointerdown", stop);
+    track.addEventListener("touchstart", stop, { passive: true });
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (en) { svc.visible = en[0].isIntersecting; }, { threshold: 0.5 }).observe(track);
+      // Al deslizar con el dedo, marcar la tarjeta que quedó a la vista.
+      var cardIO = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) { if (e.isIntersecting) svcMark(svcItems().indexOf(e.target)); });
+      }, { root: track, threshold: 0.6 });
+      var watch = function () { cardIO.disconnect(); svcItems().forEach(function (li) { cardIO.observe(li); }); };
+      new MutationObserver(watch).observe(track, { childList: true });
+      watch();
+    }
+    setInterval(function () {
+      if (svc.stopped || !svc.visible || !svcAuto.matches || document.hidden) return;
+      svcGo(svc.idx + 1);
+    }, 4500);
   }
 
   /* ---------- Proyectos ---------- */
@@ -541,6 +598,7 @@
     renderFilters();
     renderProjects();
     renderProjectNames();
+    initServiceCarousel();
     initAccordion();
     setRegion("ar");
     initNav();
