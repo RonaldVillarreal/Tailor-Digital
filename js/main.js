@@ -89,6 +89,27 @@
     var cta = $("a.btn", panel);
     cta.textContent = esVE() ? "Quiero cotizar este servicio" : "Quiero consultar por este servicio";
     cta.href = waLink("Hola Ronald, me interesa «" + pick(s.titulo, s.tituloVE) + "». ¿Podemos conversar?");
+    renderServiceList();
+  }
+
+  function renderServiceList() {
+    var ul = $("#service-list");
+    ul.innerHTML = "";
+    DATA.servicios.forEach(function (s) {
+      var titulo = pick(s.titulo, s.tituloVE);
+      var li = document.createElement("li");
+      li.innerHTML =
+        "<a class='service-row' target='_blank' rel='noopener'>" +
+          "<span class='sr-text'><strong></strong><span></span></span>" +
+          "<svg viewBox='0 0 24 24' aria-hidden='true'><path d='M5 12h14m-6-6 6 6-6 6'/></svg>" +
+        "</a>";
+      $("strong", li).textContent = titulo;
+      $(".sr-text span", li).textContent = pick(s.corto || s.resumen, s.cortoVE || s.corto);
+      var a = $("a", li);
+      a.href = waLink("Hola Ronald, me interesa «" + titulo + "». ¿Podemos conversar?");
+      a.setAttribute("aria-label", titulo + ": consultar por WhatsApp");
+      ul.appendChild(li);
+    });
   }
 
   /* ---------- Proyectos ---------- */
@@ -145,44 +166,18 @@
         grid.appendChild(card);
       });
     reveal($$(".project-card", grid));
-    buildProjectDots();
   }
 
-  /* ---------- Carrusel de proyectos en celular: barras de posición sincronizadas con el dedo ---------- */
-  var projectIO = null;
-
-  function setProjectDot(i) {
-    $$("#project-dots button").forEach(function (b, j) {
-      b.classList.toggle("is-done", j <= i);
-      if (j === i) b.setAttribute("aria-current", "true"); else b.removeAttribute("aria-current");
+  function renderProjectNames() {
+    var ul = $("#project-names");
+    ul.innerHTML = "";
+    DATA.proyectos.forEach(function (p) {
+      var li = document.createElement("li");
+      li.innerHTML = "<span class='chip'></span><span class='pn-title'></span>";
+      $(".chip", li).textContent = p.rubro;
+      $(".pn-title", li).textContent = p.titulo;
+      ul.appendChild(li);
     });
-  }
-
-  function buildProjectDots() {
-    var track = $("#project-grid"), dots = $("#project-dots");
-    var items = $$(".project-card", track);
-    dots.innerHTML = "";
-    track.scrollLeft = 0;
-    if (projectIO) projectIO.disconnect();
-    if (items.length < 2) return;
-    items.forEach(function (card, i) {
-      var b = document.createElement("button");
-      b.type = "button";
-      b.setAttribute("aria-label", "Ver proyecto " + (i + 1) + " de " + items.length);
-      b.innerHTML = "<span></span>";
-      b.addEventListener("click", function () {
-        var pad = parseFloat(getComputedStyle(track).paddingLeft) || 0;
-        track.scrollTo({ left: card.offsetLeft - track.offsetLeft - pad, behavior: "smooth" });
-      });
-      dots.appendChild(b);
-    });
-    setProjectDot(0);
-    if ("IntersectionObserver" in window) {
-      projectIO = new IntersectionObserver(function (entries) {
-        entries.forEach(function (en) { if (en.isIntersecting) setProjectDot(items.indexOf(en.target)); });
-      }, { root: track, threshold: 0.6 });
-      items.forEach(function (card) { projectIO.observe(card); });
-    }
   }
 
   function openProject(p) {
@@ -346,13 +341,13 @@
      Escritorio: paneles lado a lado; el abierto avanza solo cada 6 s (lo marca la línea de progreso,
      que es una animación CSS: al terminar, pasa al siguiente). Se pausa con el mouse encima, con foco
      de teclado adentro, fuera de pantalla o con el botón de pausa.
-     Celular: carrusel horizontal con barras tipo historias; deslizar o tocar detiene el pase automático.
+     Celular: menú desplegable vertical (se abre y cierra tocando cada fila), sin pase automático.
      "Reducir movimiento": sin pase automático. */
   var ACC_GAP = 12;
   var accIndex = 0;
-  var accAuto = window.matchMedia("(prefers-reduced-motion: no-preference)");
+  var accAuto = window.matchMedia("(min-width: 900px) and (prefers-reduced-motion: no-preference)");
   var accMobile = window.matchMedia("(max-width: 899px)");
-  var accSyncing = false; // true mientras el carrusel se mueve por código (no por el dedo)
+  var accTouched = false; // en celular: true cuando la persona ya abrió o cerró alguna fila
 
   function byId(list, id) { return list.filter(function (x) { return x.id === id; })[0]; }
 
@@ -380,6 +375,7 @@
             "<h2></h2><p class='acc-text'></p>" +
             "<button class='acc-link' type='button'><span></span><svg viewBox='0 0 24 24' aria-hidden='true'><path d='M7 17 17 7M8 7h9v9'/></svg></button>" +
           "</div>" +
+          "<div class='acc-mobile'><p class='acc-short'></p><ul class='acc-points'></ul></div>" +
           "<div class='acc-foot'>" +
             "<div class='acc-progress' aria-hidden='true'><span></span></div>" +
             "<h3>Incluye</h3><ul></ul>" +
@@ -390,20 +386,33 @@
       $(".acc-text", panel).textContent = pick(s.resumen, s.resumenVE);
       $(".acc-link span", panel).textContent = "Ver proyecto: " + p.titulo;
       $(".acc-link", panel).addEventListener("click", function () { openProject(p); });
-      var ul = $("ul", panel);
+      $(".acc-short", panel).textContent = pick(s.corto || s.resumen, s.cortoVE || s.corto);
+      (d.puntos || []).forEach(function (pt) {
+        var li = document.createElement("li"); li.textContent = pt; $(".acc-points", panel).appendChild(li);
+      });
+      var ul = $(".acc-foot ul", panel);
       s.incluye.slice(0, 4).forEach(function (item) {
         var li = document.createElement("li"); li.textContent = item; ul.appendChild(li);
       });
       box.appendChild(panel);
     });
-    renderAccDots();
     accOpen(accIndex);
+    accMobileInicial();
     accLayout();
+  }
+
+  // Celular: al entrar, todas las filas cerradas (hasta que la persona toque alguna).
+  function accMobileInicial() {
+    if (!accMobile.matches || accTouched) return;
+    accPanels().forEach(function (p) {
+      p.classList.remove("is-open");
+      $(".acc-tab", p).setAttribute("aria-expanded", "false");
+    });
   }
 
   function accPanels() { return $$("#acc .acc-panel"); }
 
-  function accOpen(i, focusTab, fromSwipe) {
+  function accOpen(i, focusTab) {
     var panels = accPanels();
     accIndex = (i + panels.length) % panels.length;
     panels.forEach(function (p, j) {
@@ -411,31 +420,7 @@
       p.classList.toggle("is-open", on);
       $(".acc-tab", p).setAttribute("aria-expanded", String(on));
     });
-    $$("#acc-dots button").forEach(function (b, j) {
-      b.classList.toggle("is-done", j < accIndex);
-      if (j === accIndex) b.setAttribute("aria-current", "true"); else b.removeAttribute("aria-current");
-    });
-    if (accMobile.matches && !fromSwipe) {
-      var box = $("#acc"), target = panels[accIndex];
-      accSyncing = true;
-      clearTimeout(accOpen.t);
-      accOpen.t = setTimeout(function () { accSyncing = false; }, 700);
-      box.scrollTo({ left: target.offsetLeft - box.offsetLeft - parseFloat(getComputedStyle(box).paddingLeft || 0), behavior: "smooth" });
-    }
     if (focusTab) $(".acc-tab", panels[accIndex]).focus({ preventScroll: true });
-  }
-
-  function renderAccDots() {
-    var dots = $("#acc-dots");
-    dots.innerHTML = "";
-    accPanels().forEach(function (p, j) {
-      var b = document.createElement("button");
-      b.type = "button";
-      b.setAttribute("aria-label", "Ir a: " + $(".acc-label", p).textContent);
-      b.innerHTML = "<span></span>";
-      b.addEventListener("click", function () { accSetPaused(true); accOpen(j); });
-      dots.appendChild(b);
-    });
   }
 
   function accLayout() {
@@ -445,6 +430,15 @@
     box.style.setProperty("--strip", strip + "px");
     box.style.setProperty("--open-w", Math.max(0, box.clientWidth - (n - 1) * (strip + ACC_GAP)) + "px");
     box.parentNode.classList.toggle("no-auto", !accAuto.matches);
+  }
+
+  // Celular: si al abrir una fila la de arriba se cerró y la página "saltó", volver a mostrar la fila tocada.
+  function accKeepInView(panel) {
+    requestAnimationFrame(function () {
+      var top = panel.getBoundingClientRect().top;
+      var headerH = $(".site-header").offsetHeight;
+      if (top < headerH + 8) window.scrollBy(0, top - headerH - 8);
+    });
   }
 
   function accSetPaused(paused) {
@@ -465,7 +459,17 @@
       var t = e.target.closest("button");
       if (!t || !box.contains(t)) return;
       var panels = accPanels();
-      if (t.classList.contains("acc-tab")) accOpen(panels.indexOf(t.closest(".acc-panel")));
+      if (t.classList.contains("acc-tab")) {
+        var panel = t.closest(".acc-panel");
+        if (accMobile.matches) accTouched = true;
+        if (accMobile.matches && panel.classList.contains("is-open")) {
+          panel.classList.remove("is-open");
+          t.setAttribute("aria-expanded", "false");
+          return;
+        }
+        accOpen(panels.indexOf(panel));
+        if (accMobile.matches) accKeepInView(panel);
+      }
       else if (t.classList.contains("acc-prev")) accOpen(accIndex - 1);
       else if (t.classList.contains("acc-next")) accOpen(accIndex + 1);
       else if (t.classList.contains("acc-pause")) accSetPaused(!wrap.classList.contains("is-paused"));
@@ -501,28 +505,13 @@
         wrap.classList.toggle("is-off", !entries[0].isIntersecting);
       }, { threshold: 0.35 }).observe(box);
 
-      // Celular: al deslizar con el dedo, el panel que queda centrado pasa a ser el activo.
-      var swipeIO = new IntersectionObserver(function (entries) {
-        if (!accMobile.matches || accSyncing) return;
-        entries.forEach(function (en) {
-          if (en.isIntersecting) {
-            var idx = accPanels().indexOf(en.target);
-            if (idx > -1 && idx !== accIndex) accOpen(idx, false, true);
-          }
-        });
-      }, { root: box, threshold: 0.6 });
-      new MutationObserver(function () {
-        swipeIO.disconnect();
-        accPanels().forEach(function (p) { swipeIO.observe(p); });
-      }).observe(box, { childList: true });
-      accPanels().forEach(function (p) { swipeIO.observe(p); });
     }
 
     if ("ResizeObserver" in window) new ResizeObserver(accLayout).observe(box);
     else window.addEventListener("resize", accLayout);
     window.addEventListener("load", accLayout);
     if (accAuto.addEventListener) accAuto.addEventListener("change", accLayout);
-    if (accMobile.addEventListener) accMobile.addEventListener("change", function () { accOpen(accIndex); });
+    if (accMobile.addEventListener) accMobile.addEventListener("change", function () { accOpen(accIndex); accMobileInicial(); accLayout(); });
   }
 
   /* ---------- Al refrescar, volver siempre al inicio de la página ---------- */
@@ -551,6 +540,7 @@
     initReveal();
     renderFilters();
     renderProjects();
+    renderProjectNames();
     initAccordion();
     setRegion("ar");
     initNav();

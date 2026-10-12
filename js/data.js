@@ -15,9 +15,11 @@ window.IAS = {
     instagram: "https://www.instagram.com/aisolutionsiv?cplk=MXZodjN6Y2t5eTMyag%3D%3D&utm_source=qr"
   },
 
+  /* servicios: `corto` es la frase de una línea que se ve en celular. */
   servicios: [
     {
       id: "landing",
+      corto: "Tu negocio en una página que lleva a WhatsApp.",
       titulo: "Landing pages",
       resumen: "Una página clara que explica lo que hacés y lleva a la gente a escribirte.",
       para: "Profesionales, comercios y emprendedores que hoy dependen solo de Instagram o del boca a boca.",
@@ -32,6 +34,7 @@ window.IAS = {
     },
     {
       id: "turnos",
+      corto: "Tus clientes reservan solos, a cualquier hora.",
       titulo: "Sistemas de turnos online",
       tituloVE: "Sistemas de citas online",
       resumen: "Tus clientes reservan solos, a cualquier hora, y vos dejás de contestar mensajes para coordinar horarios.",
@@ -49,6 +52,8 @@ window.IAS = {
     },
     {
       id: "tienda",
+      corto: "Vendé online con catálogo, carrito y pedidos.",
+      cortoVE: "Vende online con catálogo, carrito y pedidos.",
       titulo: "Tiendas online",
       resumen: "Catálogo, carrito y pedidos organizados, para vender sin armar todo a mano por mensaje.",
       para: "Comercios, marcas y emprendimientos que quieren vender a todo el país o a otras ciudades.",
@@ -63,6 +68,7 @@ window.IAS = {
     },
     {
       id: "crm",
+      corto: "Ningún cliente se pierde entre los mensajes.",
       titulo: "CRM y seguimiento de clientes",
       resumen: "Un tablero donde ves quién consultó, quién espera respuesta y a quién hay que volver a escribir.",
       para: "Negocios que reciben consultas por WhatsApp o redes y se les pierden en el camino.",
@@ -77,6 +83,8 @@ window.IAS = {
     },
     {
       id: "medida",
+      corto: "Software hecho a la medida de cómo trabajás.",
+      cortoVE: "Software hecho a la medida de cómo trabajas.",
       titulo: "Sistemas a medida",
       resumen: "Software pensado para cómo trabaja tu organización, con usuarios, permisos y reportes.",
       para: "Escuelas, clínicas, empresas chicas y organizaciones con procesos que hoy viven en planillas.",
@@ -91,6 +99,7 @@ window.IAS = {
     },
     {
       id: "auto",
+      corto: "Avisos y planillas que se completan solos.",
       titulo: "Automatizaciones",
       resumen: "Mensajes, avisos y planillas que se llenan solos, para ahorrar horas de trabajo repetitivo.",
       resumenVE: "Mensajes, avisos y planillas que se llenan solos, para ahorrar horas de trabajo repetitivo.",
@@ -105,12 +114,17 @@ window.IAS = {
   ],
 
   /* Paneles del acordeón del inicio (después del panel de presentación).
-     servicio: id de `servicios`; proyecto: id de `proyectos` (su captura va de fondo). */
+     servicio: id de `servicios`; proyecto: id de `proyectos` (su captura va de fondo).
+     puntos: 3 etiquetas cortas que se ven en celular en lugar de la lista completa. */
   destacados: [
-    { servicio: "turnos", proyecto: "turnos-psicologia", etiqueta: "Turnos online", etiquetaVE: "Citas online" },
-    { servicio: "tienda", proyecto: "tienda-papeleria", etiqueta: "Tiendas online" },
-    { servicio: "crm", proyecto: "crm-whatsapp", etiqueta: "CRM + WhatsApp" },
-    { servicio: "medida", proyecto: "gestion-escolar", etiqueta: "Sistemas a medida" }
+    { servicio: "turnos", proyecto: "turnos-psicologia", etiqueta: "Turnos online", etiquetaVE: "Citas online",
+      puntos: ["Agenda por profesional", "Seña online", "Recordatorios por WhatsApp"] },
+    { servicio: "tienda", proyecto: "tienda-papeleria", etiqueta: "Tiendas online",
+      puntos: ["Catálogo con fotos", "Carrito y pagos", "Control de stock"] },
+    { servicio: "crm", proyecto: "crm-whatsapp", etiqueta: "CRM + WhatsApp",
+      puntos: ["Contactos por etapa", "Conexión con WhatsApp", "Recordatorios y tareas"] },
+    { servicio: "medida", proyecto: "gestion-escolar", etiqueta: "Sistemas a medida",
+      puntos: ["Usuarios y permisos", "Panel de administración", "Reportes exportables"] }
   ],
 
   rubros: ["Salud", "Educación", "Comercio", "Servicios"],
