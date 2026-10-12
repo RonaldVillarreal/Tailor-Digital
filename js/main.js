@@ -308,10 +308,13 @@
      Escritorio: paneles lado a lado; el abierto avanza solo cada 6 s (lo marca la línea de progreso,
      que es una animación CSS: al terminar, pasa al siguiente). Se pausa con el mouse encima, con foco
      de teclado adentro, fuera de pantalla o con el botón de pausa.
-     Celular o "reducir movimiento": acordeón vertical, sin pase automático. */
+     Celular: carrusel horizontal con barras tipo historias; deslizar o tocar detiene el pase automático.
+     "Reducir movimiento": sin pase automático. */
   var ACC_GAP = 12;
   var accIndex = 0;
-  var accAuto = window.matchMedia("(min-width: 900px) and (prefers-reduced-motion: no-preference)");
+  var accAuto = window.matchMedia("(prefers-reduced-motion: no-preference)");
+  var accMobile = window.matchMedia("(max-width: 899px)");
+  var accSyncing = false; // true mientras el carrusel se mueve por código (no por el dedo)
 
   function byId(list, id) { return list.filter(function (x) { return x.id === id; })[0]; }
 
@@ -355,13 +358,14 @@
       });
       box.appendChild(panel);
     });
+    renderAccDots();
     accOpen(accIndex);
     accLayout();
   }
 
   function accPanels() { return $$("#acc .acc-panel"); }
 
-  function accOpen(i, focusTab) {
+  function accOpen(i, focusTab, fromSwipe) {
     var panels = accPanels();
     accIndex = (i + panels.length) % panels.length;
     panels.forEach(function (p, j) {
@@ -369,7 +373,31 @@
       p.classList.toggle("is-open", on);
       $(".acc-tab", p).setAttribute("aria-expanded", String(on));
     });
-    if (focusTab) $(".acc-tab", panels[accIndex]).focus();
+    $$("#acc-dots button").forEach(function (b, j) {
+      b.classList.toggle("is-done", j < accIndex);
+      if (j === accIndex) b.setAttribute("aria-current", "true"); else b.removeAttribute("aria-current");
+    });
+    if (accMobile.matches && !fromSwipe) {
+      var box = $("#acc"), target = panels[accIndex];
+      accSyncing = true;
+      clearTimeout(accOpen.t);
+      accOpen.t = setTimeout(function () { accSyncing = false; }, 700);
+      box.scrollTo({ left: target.offsetLeft - box.offsetLeft - parseFloat(getComputedStyle(box).paddingLeft || 0), behavior: "smooth" });
+    }
+    if (focusTab) $(".acc-tab", panels[accIndex]).focus({ preventScroll: true });
+  }
+
+  function renderAccDots() {
+    var dots = $("#acc-dots");
+    dots.innerHTML = "";
+    accPanels().forEach(function (p, j) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.setAttribute("aria-label", "Ir a: " + $(".acc-label", p).textContent);
+      b.innerHTML = "<span></span>";
+      b.addEventListener("click", function () { accSetPaused(true); accOpen(j); });
+      dots.appendChild(b);
+    });
   }
 
   function accLayout() {
@@ -378,12 +406,12 @@
     var strip = window.innerWidth < 1300 ? 80 : 96;
     box.style.setProperty("--strip", strip + "px");
     box.style.setProperty("--open-w", Math.max(0, box.clientWidth - (n - 1) * (strip + ACC_GAP)) + "px");
-    box.classList.toggle("no-auto", !accAuto.matches);
+    box.parentNode.classList.toggle("no-auto", !accAuto.matches);
   }
 
   function accSetPaused(paused) {
     var box = $("#acc");
-    box.classList.toggle("is-paused", paused);
+    box.parentNode.classList.toggle("is-paused", paused);
     $$(".acc-pause", box).forEach(function (b) {
       b.setAttribute("aria-pressed", String(paused));
       b.setAttribute("aria-label", paused ? "Reanudar el pase automático" : "Pausar el pase automático");
@@ -392,6 +420,7 @@
 
   function initAccordion() {
     var box = $("#acc");
+    var wrap = box.parentNode;
     box.style.setProperty("--gap", ACC_GAP + "px");
 
     box.addEventListener("click", function (e) {
@@ -401,7 +430,7 @@
       if (t.classList.contains("acc-tab")) accOpen(panels.indexOf(t.closest(".acc-panel")));
       else if (t.classList.contains("acc-prev")) accOpen(accIndex - 1);
       else if (t.classList.contains("acc-next")) accOpen(accIndex + 1);
-      else if (t.classList.contains("acc-pause")) accSetPaused(!box.classList.contains("is-paused"));
+      else if (t.classList.contains("acc-pause")) accSetPaused(!wrap.classList.contains("is-paused"));
     });
 
     box.addEventListener("keydown", function (e) {
@@ -414,31 +443,48 @@
     });
 
     // Al terminar la línea de progreso del panel abierto, pasa al siguiente.
-    box.addEventListener("animationend", function (e) {
+    wrap.addEventListener("animationend", function (e) {
       if (e.animationName === "acc-fill" && accAuto.matches) accOpen(accIndex + 1);
     });
 
     // Pausas automáticas: mouse encima, foco de teclado adentro, toque (el usuario tomó el control).
-    box.addEventListener("mouseenter", function () { box.classList.add("is-hover"); });
-    box.addEventListener("mouseleave", function () { box.classList.remove("is-hover"); });
+    box.addEventListener("mouseenter", function () { wrap.classList.add("is-hover"); });
+    box.addEventListener("mouseleave", function () { wrap.classList.remove("is-hover"); });
     box.addEventListener("focusin", function (e) {
-      if (e.target.matches && e.target.matches(":focus-visible")) box.classList.add("is-focus");
+      if (e.target.matches && e.target.matches(":focus-visible")) wrap.classList.add("is-focus");
     });
     box.addEventListener("focusout", function (e) {
-      if (!box.contains(e.relatedTarget)) box.classList.remove("is-focus");
+      if (!box.contains(e.relatedTarget)) wrap.classList.remove("is-focus");
     });
     box.addEventListener("pointerdown", function (e) { if (e.pointerType === "touch") accSetPaused(true); });
 
     if ("IntersectionObserver" in window) {
       new IntersectionObserver(function (entries) {
-        box.classList.toggle("is-off", !entries[0].isIntersecting);
+        wrap.classList.toggle("is-off", !entries[0].isIntersecting);
       }, { threshold: 0.35 }).observe(box);
+
+      // Celular: al deslizar con el dedo, el panel que queda centrado pasa a ser el activo.
+      var swipeIO = new IntersectionObserver(function (entries) {
+        if (!accMobile.matches || accSyncing) return;
+        entries.forEach(function (en) {
+          if (en.isIntersecting) {
+            var idx = accPanels().indexOf(en.target);
+            if (idx > -1 && idx !== accIndex) accOpen(idx, false, true);
+          }
+        });
+      }, { root: box, threshold: 0.6 });
+      new MutationObserver(function () {
+        swipeIO.disconnect();
+        accPanels().forEach(function (p) { swipeIO.observe(p); });
+      }).observe(box, { childList: true });
+      accPanels().forEach(function (p) { swipeIO.observe(p); });
     }
 
     if ("ResizeObserver" in window) new ResizeObserver(accLayout).observe(box);
     else window.addEventListener("resize", accLayout);
     window.addEventListener("load", accLayout);
     if (accAuto.addEventListener) accAuto.addEventListener("change", accLayout);
+    if (accMobile.addEventListener) accMobile.addEventListener("change", function () { accOpen(accIndex); });
   }
 
   /* ---------- Al refrescar, volver siempre al inicio de la página ---------- */

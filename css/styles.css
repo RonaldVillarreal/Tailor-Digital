@@ -211,12 +211,13 @@ main > .section { padding-inline: var(--gutter); }
 .acc-progress { position: relative; height: 2px; background: rgba(255, 255, 255, .25); max-width: 560px; overflow: hidden; }
 .acc-progress span { position: absolute; inset: 0; background: var(--white); transform: scaleX(0); transform-origin: left; }
 .acc-panel.is-open .acc-progress span { animation: acc-fill 6s linear forwards; }
-.acc.is-hover .acc-progress span, .acc.is-focus .acc-progress span,
-.acc.is-paused .acc-progress span, .acc.is-off .acc-progress span { animation-play-state: paused; }
-.acc.no-auto .acc-progress span { animation: none; transform: scaleX(1); }
+.hero-acc.is-hover .acc-progress span, .hero-acc.is-focus .acc-progress span,
+.hero-acc.is-paused .acc-progress span, .hero-acc.is-off .acc-progress span { animation-play-state: paused; }
+.hero-acc.no-auto .acc-progress span { animation: none; transform: scaleX(1); }
 @keyframes acc-fill { to { transform: scaleX(1); } }
 
 /* Flechas y pausa */
+.acc-dots { display: none; }
 .acc-ctrl { position: absolute; right: clamp(24px, 3vw, 40px); bottom: clamp(24px, 3vw, 40px); display: flex; gap: 10px; }
 .acc-ctrl button {
   width: 52px; height: 52px; border-radius: 50%; border: 1.5px solid rgba(255, 255, 255, .85); background: transparent;
@@ -227,7 +228,7 @@ main > .section { padding-inline: var(--gutter); }
 .acc-ctrl .i-play { display: none; fill: currentColor; stroke: none; }
 .acc-pause[aria-pressed="true"] .i-play { display: block; }
 .acc-pause[aria-pressed="true"] .i-pause { display: none; }
-.acc.no-auto .acc-pause { display: none; }
+.hero-acc.no-auto .acc-pause { display: none; }
 
 /* Panel de presentación */
 .acc-intro .acc-content { display: grid; grid-template-columns: 1.15fr .85fr; gap: clamp(24px, 3.4vw, 56px); align-items: center; }
@@ -265,32 +266,58 @@ main > .section { padding-inline: var(--gutter); }
 .acc-foot li { position: relative; padding-left: 18px; font-weight: 600; color: var(--pizarra-50); }
 .acc-foot li::before { content: ""; position: absolute; left: 0; top: .6em; width: 7px; height: 7px; border-radius: 50%; background: var(--pizarra-300); }
 
-/* Celular y "reducir movimiento" en pantallas chicas: acordeón vertical */
+/* Celular: carrusel horizontal con barras tipo historias */
 @media (max-width: 899px) {
-  .hero-acc { padding: 12px 12px 0; }
-  .acc { flex-direction: column; height: auto; }
-  .acc-panel, .acc-panel.is-open { flex: none; }
-  .acc-tab, .acc-panel.is-open .acc-tab {
-    position: relative; inset: auto; flex-direction: row; justify-content: flex-start; gap: 12px;
-    padding: 18px 20px; cursor: pointer;
+  .hero-acc { padding: 12px 0 0; }
+  .acc-dots { display: flex; gap: 6px; padding: 4px 16px 12px; }
+  .acc-dots button { flex: 1; height: 24px; padding: 0; border: 0; background: none; cursor: pointer; display: flex; align-items: center; }
+  .acc-dots span { position: relative; display: block; width: 100%; height: 4px; border-radius: 4px; background: var(--puntada); overflow: hidden; }
+  .acc-dots span::after { content: ""; position: absolute; inset: 0; background: var(--brand); transform: scaleX(0); transform-origin: left; }
+  .acc-dots .is-done span::after { transform: scaleX(1); }
+  .acc-dots [aria-current] span::after { animation: acc-fill 6s linear forwards; }
+  .hero-acc.is-paused .acc-dots [aria-current] span::after, .hero-acc.is-off .acc-dots [aria-current] span::after { animation-play-state: paused; }
+  .hero-acc.is-paused .acc-dots [aria-current] span::after, .hero-acc.no-auto .acc-dots [aria-current] span::after { animation: none; transform: scaleX(1); }
+
+  .acc {
+    height: auto; gap: 12px; overflow-x: auto; overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory; padding: 0 16px 4px; scroll-padding-inline: 16px; scrollbar-width: none;
   }
-  .acc-label, .acc-panel.is-open .acc-label { writing-mode: horizontal-tb; transform: none; margin: 0 auto 0 0; font-size: 1.05rem; font-family: var(--f-head); font-weight: 700; }
-  .acc-plus { width: 36px; height: 36px; }
-  .acc-plus::before, .acc-plus::after { width: 13px; }
-  .acc-panel.is-open .acc-plus { display: block; }
-  .acc-panel.is-open .acc-plus::after { transform: translate(-50%, -50%); }
-  .acc-content, .acc-panel.is-open .acc-content { position: relative; inset: auto; width: auto; transform: none; transition: none; padding: 4px 20px 24px; }
-  .acc-content { display: none; }
-  .acc-panel.is-open .acc-content { display: flex; }
-  .acc-intro.is-open .acc-content { display: grid; grid-template-columns: 1fr; padding-bottom: 24px; }
-  .acc-intro .demo-wrap { margin-top: 26px; }
+  .acc::-webkit-scrollbar { display: none; }
+  .acc-panel, .acc-panel.is-open { flex: 0 0 86%; display: flex; flex-direction: column; scroll-snap-align: start; scroll-snap-stop: always; transition: none; }
+
+  /* Cada tarjeta muestra su contenido; la pestaña queda como etiqueta arriba */
+  .acc-tab, .acc-panel.is-open .acc-tab {
+    position: relative; inset: auto; width: auto; flex-direction: row; justify-content: flex-start; gap: 10px;
+    padding: 18px 20px 6px; cursor: pointer;
+  }
+  .acc-label, .acc-panel.is-open .acc-label { writing-mode: horizontal-tb; transform: none; margin: 0; font-family: var(--f-body); font-weight: 600; font-size: .95rem; }
+  .acc-plus, .acc-panel.is-open .acc-plus { display: none; }
+  .acc-dot { width: 10px; height: 10px; }
+  .acc-content, .acc-panel.is-open .acc-content {
+    position: relative; inset: auto; width: auto; flex: 1; display: flex; flex-direction: column;
+    opacity: 1; visibility: visible; transform: none; transition: none; padding: 8px 20px 22px;
+  }
+  .acc-intro .acc-content, .acc-intro.is-open .acc-content { display: flex; }
+  .acc-intro h1 { font-size: clamp(1.9rem, 8vw, 2.4rem); }
+  .acc-intro .lead { font-size: 1rem; }
+  .acc-intro .hero-note { display: none; }
+  .acc-intro .demo-wrap { margin-top: 30px; }
   .acc-main, .acc-foot { width: auto; }
-  .acc-panel.is-open { display: flex; flex-direction: column; }
-  .acc-panel.is-open .acc-bg { position: relative; inset: auto; order: 3; width: calc(100% - 40px); margin: 0 20px 22px; transform: none; animation: none; }
-  .acc-foot { margin-top: 28px; }
+  .acc-main h2 { font-size: clamp(1.7rem, 7vw, 2.1rem); }
+  .acc-foot { margin-top: 26px; }
+  .acc-foot h3 { margin-top: 0; }
   .acc-foot ul { grid-template-columns: 1fr; }
+  .acc-service::after, .acc-service:not(.is-open)::after { display: none; }
+  /* Tarjetas de servicio: texto, captura e "Incluye", en ese orden */
+  .acc-service .acc-content, .acc-service.is-open .acc-content { display: contents; }
+  .acc-service .acc-main { order: 1; padding: 8px 20px 0; }
+  .acc-service .acc-foot { order: 3; padding: 0 20px 24px; }
+  .acc-bg, .acc-panel.is-open .acc-bg {
+    position: relative; inset: auto; order: 2; width: calc(100% - 40px); height: auto; aspect-ratio: 16 / 10;
+    margin: 26px 20px 0; opacity: 1; filter: none; transform: none; animation: none; border-radius: 10px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, .4);
+  }
   .acc-ctrl, .acc-progress { display: none; }
-  .acc-panel { transition: none; }
 }
 
 /* Demo del turnero (el momento memorable de la página) */
