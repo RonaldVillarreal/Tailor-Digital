@@ -551,7 +551,8 @@ dialog::backdrop { background: rgba(13, 27, 58, 0.7); }
 .wa-float svg { width: 28px; height: 28px; flex: 0 0 auto; }
 .wa-float span { display: none; }
 
-/* ----- Proyectos y Cómo trabajamos en celular: carrusel con deslizamiento nativo ----- */
+/* ----- Celular: Proyectos en carrusel con barras; Cómo trabajamos en línea de tiempo ----- */
+.hs-dots { display: none; }
 @media (max-width: 899px) {
   .hs-track {
     display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain;
@@ -560,8 +561,21 @@ dialog::backdrop { background: rgba(13, 27, 58, 0.7); }
   }
   .hs-track::-webkit-scrollbar { display: none; }
   .hs-track > * { flex: 0 0 min(84%, 340px); scroll-snap-align: start; }
-  .steps.hs-track li { padding: 70px 20px 22px; }
-  .steps.hs-track li::before { left: 20px; top: 20px; }
+  .hs-dots { display: flex; gap: 6px; margin-top: 8px; }
+  .hs-dots button { flex: 1; max-width: 52px; height: 24px; padding: 0; border: 0; background: none; cursor: pointer; display: flex; align-items: center; }
+  .hs-dots span { display: block; width: 100%; height: 4px; border-radius: 4px; background: var(--pizarra-700); transition: background-color .3s; }
+  .hs-dots .is-done span { background: var(--pizarra-300); }
+  .hs-dots [aria-current] span { background: var(--white); }
+
+  /* Línea de tiempo: los pasos unidos por un hilo punteado (la puntada de la marca) */
+  .steps { gap: 14px; }
+  .steps li { margin-left: 56px; padding: 18px 20px 20px; }
+  .steps li::before { left: -56px; top: 14px; box-shadow: 0 0 0 6px var(--paper); }
+  .steps li:not(:last-child)::after {
+    content: ""; position: absolute; left: -37px; top: 60px; bottom: -28px;
+    border-left: 2px dashed var(--pizarra-300);
+  }
+  .steps h3 { font-size: 1.15rem; }
 }
 
 /* ----- Aparición al hacer scroll (main.js agrega .reveal solo si hay movimiento permitido) ----- */

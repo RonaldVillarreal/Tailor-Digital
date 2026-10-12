@@ -145,6 +145,44 @@
         grid.appendChild(card);
       });
     reveal($$(".project-card", grid));
+    buildProjectDots();
+  }
+
+  /* ---------- Carrusel de proyectos en celular: barras de posición sincronizadas con el dedo ---------- */
+  var projectIO = null;
+
+  function setProjectDot(i) {
+    $$("#project-dots button").forEach(function (b, j) {
+      b.classList.toggle("is-done", j <= i);
+      if (j === i) b.setAttribute("aria-current", "true"); else b.removeAttribute("aria-current");
+    });
+  }
+
+  function buildProjectDots() {
+    var track = $("#project-grid"), dots = $("#project-dots");
+    var items = $$(".project-card", track);
+    dots.innerHTML = "";
+    track.scrollLeft = 0;
+    if (projectIO) projectIO.disconnect();
+    if (items.length < 2) return;
+    items.forEach(function (card, i) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.setAttribute("aria-label", "Ver proyecto " + (i + 1) + " de " + items.length);
+      b.innerHTML = "<span></span>";
+      b.addEventListener("click", function () {
+        var pad = parseFloat(getComputedStyle(track).paddingLeft) || 0;
+        track.scrollTo({ left: card.offsetLeft - track.offsetLeft - pad, behavior: "smooth" });
+      });
+      dots.appendChild(b);
+    });
+    setProjectDot(0);
+    if ("IntersectionObserver" in window) {
+      projectIO = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) { if (en.isIntersecting) setProjectDot(items.indexOf(en.target)); });
+      }, { root: track, threshold: 0.6 });
+      items.forEach(function (card) { projectIO.observe(card); });
+    }
   }
 
   function openProject(p) {
