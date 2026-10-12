@@ -518,13 +518,11 @@ dialog::backdrop { background: rgba(13, 27, 58, 0.7); }
 .footer-brand > p { margin-top: 16px; max-width: 30em; }
 .social { list-style: none; margin: 22px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
 .social a {
-  display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 999px;
-  border: 1.5px solid var(--pizarra-600); color: var(--paper); text-decoration: none; font-weight: 600;
-  transition: border-color .15s, background-color .15s, color .15s;
+  display: inline-flex; align-items: center; justify-content: center; padding: 4px; border-radius: 8px;
+  color: var(--pizarra-200); text-decoration: none; transition: color .15s;
 }
-.social a svg { width: 36px; height: 36px; padding: 7px; border-radius: 50%; background: var(--pizarra-700); }
-.social a:hover { border-color: var(--pizarra-300); color: var(--white); }
-.social a:hover svg { background: var(--white); color: var(--ink); }
+.social a svg { width: 30px; height: 30px; }
+.social a:hover { color: var(--white); }
 .footer-col h2 { font-family: var(--f-head); font-size: 1.05rem; font-weight: 700; color: var(--white); margin-bottom: 14px; }
 .footer-col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
 .footer-col a { text-decoration: none; }
@@ -551,7 +549,7 @@ dialog::backdrop { background: rgba(13, 27, 58, 0.7); }
 .wa-float span { display: none; }
 
 /* ----- Celular: Servicios en lista corta; Proyectos solo nombrados; Cómo trabajamos en línea de tiempo ----- */
-.only-mobile, .project-names, .service-list, .svc-dots { display: none; }
+.only-mobile, .project-names, .service-list, .svc-dots, .mobile-logo { display: none; }
 @media (max-width: 899px) {
   .services { display: none; }
   /* Servicios: tarjetas grandes en horizontal que avanzan solas */
@@ -580,6 +578,10 @@ dialog::backdrop { background: rgba(13, 27, 58, 0.7); }
   .svc-dots span { display: block; width: 100%; height: 4px; border-radius: 4px; background: var(--puntada); transition: background-color .3s; }
   .svc-dots [aria-current] span { background: var(--brand); }
 
+  /* Logo centrado arriba del primer título (la página arranca en Servicios) */
+  .mobile-logo { display: block; width: 150px; height: auto; margin: 0 auto 36px; }
+  #servicios { padding-top: 40px; }
+
   /* Sin el desplegable del inicio ni las preguntas frecuentes: la página arranca en Servicios */
   .hero-acc, #faq { display: none; }
 
@@ -602,9 +604,6 @@ dialog::backdrop { background: rgba(13, 27, 58, 0.7); }
   .footer-brand .brand, .footer-brand > p, .footer-col, .footer-bottom p:last-child { display: none; }
   .footer-grid { gap: 0; }
   .social { margin: 0; }
-  .social a { padding: 4px; border: 0; }
-  .social a svg { width: 30px; height: 30px; padding: 0; background: none; }
-  .social a:hover svg { background: none; color: var(--white); }
   .footer-bottom { margin-top: 16px; padding: 14px 72px 0 0; }
 
   /* Línea de tiempo: los pasos unidos por un hilo punteado (la puntada de la marca) */
