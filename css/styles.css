@@ -579,7 +579,9 @@ dialog::backdrop { background: rgba(13, 27, 58, 0.7); }
   .svc-dots [aria-current] span { background: var(--brand); }
 
   /* Logo centrado arriba del primer título (la página arranca en Servicios) */
-  .mobile-logo { display: block; width: 150px; height: auto; margin: 0 auto 36px; }
+  .mobile-logo { display: block; width: 112px; height: 112px; margin: 0 auto 32px; }
+  #servicios .section-head { text-align: center; margin-inline: auto; }
+  #servicios .section-head h2::after { margin-inline: auto; }
   #servicios { padding-top: 40px; }
 
   /* Sin el desplegable del inicio ni las preguntas frecuentes: la página arranca en Servicios */
@@ -587,13 +589,22 @@ dialog::backdrop { background: rgba(13, 27, 58, 0.7); }
 
   .only-desktop, .projects .filters, .project-grid { display: none; }
   .only-mobile { display: inline; }
-  .project-names { display: grid; gap: 10px; list-style: none; margin: 0; padding: 0; }
+  /* Proyectos: línea de tiempo (un punto por proyecto, unidos por una línea) */
+  .project-names { display: grid; gap: 0; list-style: none; margin: 0; padding: 0; }
   .project-names li {
-    display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
-    padding: 14px 16px; border-radius: var(--r-m); background: var(--ink-2); border: 1.5px solid var(--pizarra-700);
+    position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
+    padding: 0 0 26px 32px;
   }
+  .project-names li::before {
+    content: ""; position: absolute; left: 0; top: 4px; width: 14px; height: 14px; border-radius: 50%;
+    background: var(--ink); border: 2px solid var(--pizarra-300); box-sizing: border-box;
+  }
+  .project-names li:first-child::before { background: var(--pizarra-300); }
+  .project-names li:not(:last-child)::after {
+    content: ""; position: absolute; left: 6px; top: 18px; bottom: -4px; width: 2px; background: var(--pizarra-700);
+  }
+  .project-names li:last-child { padding-bottom: 0; }
   .pn-title { font-family: var(--f-head); font-weight: 700; font-size: 1.05rem; line-height: 1.25; }
-  .project-names li { gap: 4px; }
   .project-names .chip {
     order: 2; padding: 0; border-radius: 0; background: none; border: 0;
     font-size: .9rem; font-weight: 500; color: var(--pizarra-300);
