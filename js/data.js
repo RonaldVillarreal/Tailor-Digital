@@ -44,7 +44,7 @@ window.IAS = {
       incluye: [
         "Agenda por profesional, con tus días y horarios",
         "Reserva sin crear cuenta",
-        "Seña o pago online (Mercado Pago en Argentina; registro de comprobantes en Venezuela)",
+        "Seña o pago online",
         "Recordatorios por WhatsApp o mail",
         "Panel para ver, mover y cancelar turnos",
         "Historial de cada cliente"
