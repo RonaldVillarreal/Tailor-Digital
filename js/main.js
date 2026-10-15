@@ -1,4 +1,4 @@
-/* Tailor Digital — interacciones del sitio (JS plano, sin dependencias) */
+/* Nexara — interacciones del sitio (JS plano, sin dependencias) */
 (function () {
   "use strict";
 
@@ -18,8 +18,8 @@
   }
   function defaultMessage() {
     return esVE()
-      ? "Hola Ronald, vi tu web de Tailor Digital. Te escribo desde Venezuela y quiero consultar por un proyecto."
-      : "Hola Ronald, vi tu web de Tailor Digital y quiero consultar por un proyecto.";
+      ? "Hola Ronald, vi tu web de Nexara. Te escribo desde Venezuela y quiero consultar por un proyecto."
+      : "Hola Ronald, vi tu web de Nexara y quiero consultar por un proyecto.";
   }
   function refreshWaLinks() {
     $$("[data-wa]").forEach(function (a) {
@@ -190,7 +190,7 @@
   function tagChips(p) {
     return "<span class='chip'>" + p.rubro + "</span>" +
       (p.cliente ? "<span class='chip chip-client'>Entregado a cliente</span>"
-                 : "<span class='chip chip-own'>Proyecto propio de Tailor</span>");
+                 : "<span class='chip chip-own'>Proyecto propio de Nexara</span>");
   }
 
   function renderFilters() {
@@ -362,7 +362,7 @@
     }, { threshold: 0.15, rootMargin: "0px 0px -40px 0px" });
 
     [".section-head", ".services > *", ".filters",
-     ".steps li", ".why-grid article", ".faq details", ".contact-copy, .contact-links", ".footer-grid > *"]
+     ".steps li", ".why-grid article", ".faq details", ".footer-grid > *"]
       .forEach(function (sel) { reveal($$(sel)); });
   }
 
@@ -373,6 +373,7 @@
     var links = $$(".main-nav a");
     var targets = links.map(function (a) { return $(a.getAttribute("href")); });
     var ticking = false;
+    var lastCurrent = -1;
 
     function update() {
       ticking = false;
@@ -386,6 +387,14 @@
         if (i === current) a.setAttribute("aria-current", "true");
         else a.removeAttribute("aria-current");
       });
+      // Celular: correr el menú para que se vea el link de la sección actual.
+      if (current !== lastCurrent) {
+        lastCurrent = current;
+        var nav = $(".main-nav");
+        if (current > -1 && nav.scrollWidth > nav.clientWidth) {
+          nav.scrollTo({ left: Math.max(0, links[current].offsetLeft - nav.offsetLeft - 8), behavior: "smooth" });
+        }
+      }
     }
     function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
 

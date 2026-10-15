@@ -1,0 +1,37 @@
+/* ==========================================================================
+   Nexara — tokens de marca (guía de identidad v1.0, "Amanecer digital")
+   Se carga antes que styles.css.
+   ========================================================================== */
+:root {
+  /* Colores */
+  --nx-void: #05070F;
+  --nx-ink: #0B1020;          /* fondo base */
+  --nx-surface: #121935;      /* tarjetas */
+  --nx-surface-2: #1A2347;
+  --nx-line: rgba(148, 163, 255, .16);
+  --nx-violet: #7C5CFF;
+  --nx-violet-300: #A28BFF;   /* links y texto chico sobre oscuro */
+  --nx-cyan: #22D3EE;
+  --nx-ice: #F2F5FF;          /* texto */
+  --nx-mute: #9AA6D1;         /* texto secundario */
+  --nx-success: #34D399;
+  --nx-warning: #FBBF24;
+  --nx-danger: #F87171;
+  --nx-gradient: linear-gradient(135deg, #7C5CFF 0%, #22D3EE 100%);
+  --nx-glow: 0 0 0 1px rgba(124, 92, 255, .35), 0 10px 40px -10px rgba(124, 92, 255, .55);
+
+  /* Tipografía */
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Radios */
+  --radius-sm: 8px; --radius-md: 14px; --radius-lg: 22px; --radius-pill: 999px;
+}
+
+/* Texto con el degradado de marca: solo 1 o 2 palabras de énfasis por pantalla */
+.grad-text { background: var(--nx-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+/* Wordmark: NEXARA en mayúsculas con tracking amplio y la X en degradado */
+.wordmark { font-family: var(--font-display); font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--nx-ice); }
+.wordmark .x { background: var(--nx-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }

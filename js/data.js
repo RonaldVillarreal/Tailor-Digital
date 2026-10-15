@@ -3,7 +3,7 @@
   contacto, servicios y proyectos. No hace falta tocar main.js para agregar o quitar items.
 
   PROYECTOS: el campo `cliente` controla la etiqueta de cada tarjeta.
-    cliente: false -> "Proyecto propio de Tailor" (demo)
+    cliente: false -> "Proyecto propio de Nexara" (demo)
     cliente: true  -> "Entregado a cliente"
   Poné `true` solamente en los proyectos que realmente se entregaron y cuyo cliente lo autorizó.
 */

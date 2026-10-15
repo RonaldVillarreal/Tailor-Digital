@@ -1,4 +1,4 @@
-# Tailor Digital — sitio web
+# Nexara — sitio web
 
 Sitio estático (HTML + CSS + JS plano, sin build) para ofrecer landings, sistemas de turnos, tiendas, CRM y software a medida en el interior de Argentina y en Venezuela.
 
@@ -39,7 +39,7 @@ netlify.toml      Publicar en Netlify (sin build)
 
 ## Sobre los proyectos mostrados
 
-Cada tarjeta dice "Proyecto propio de Tailor" por defecto. Si un proyecto fue realmente entregado a un cliente y el cliente lo autoriza, poné `cliente: true` en `data.js` y la etiqueta cambia a "Entregado a cliente". El sitio no incluye nombres de clientes ni testimonios inventados; los testimonios solo conviene agregarlos cuando sean reales y con permiso.
+Cada tarjeta dice "Proyecto propio de Nexara" por defecto. Si un proyecto fue realmente entregado a un cliente y el cliente lo autoriza, poné `cliente: true` en `data.js` y la etiqueta cambia a "Entregado a cliente". El sitio no incluye nombres de clientes ni testimonios inventados; los testimonios solo conviene agregarlos cuando sean reales y con permiso.
 
 ## Pendientes recomendados
 
