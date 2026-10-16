@@ -379,7 +379,7 @@ main > .section { padding-inline: var(--gutter); }
 .demo-slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 14px; }
 .demo-slots button {
   border: 1px solid rgba(162, 139, 255, .55); color: var(--link); background: transparent;
-  border-radius: var(--r-s); padding: 8px 0; font-weight: 600; cursor: pointer;
+  border-radius: var(--r-s); padding: 8px 0; font-size: .9rem; font-weight: 600; cursor: pointer;
 }
 .demo-slots button:hover:not(:disabled) { background: rgba(124, 92, 255, .18); border-color: var(--brand); color: var(--text); }
 .demo-slots button[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: var(--white); }

@@ -12,7 +12,7 @@ window.IAS = {
     whatsapp: "5491127537367",            // formato internacional sin + ni espacios
     whatsappVisible: "+54 9 11 2753-7367",
     email: "ronsv10@gmail.com",
-    instagram: "https://www.instagram.com/aisolutionsiv?cplk=MXZodjN6Y2t5eTMyag%3D%3D&utm_source=qr"
+    instagram: "https://www.instagram.com/nexara_digitalba/"
   },
 
   /* servicios: `corto` es la frase de una línea que se ve en celular. */
