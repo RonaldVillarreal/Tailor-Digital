@@ -609,7 +609,7 @@
     renderProjectNames();
     initServiceCarousel();
     initAccordion();
-    setRegion("ar");
+    setRegion("ve");
     initNav();
   });
 })();
