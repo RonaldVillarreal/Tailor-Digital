@@ -602,8 +602,8 @@ dialog::backdrop { background: rgba(5, 7, 15, .78); -webkit-backdrop-filter: blu
   #servicios .section-head h2::after { margin-inline: auto; }
   #servicios { padding-top: 40px; }
 
-  /* Sin el desplegable del inicio ni las preguntas frecuentes: la página arranca en Servicios */
-  .hero-acc, #faq { display: none; }
+  /* Sin el desplegable del inicio: la página arranca en Servicios */
+  .hero-acc { display: none; }
 
   .only-desktop, .projects .filters, .project-grid { display: none; }
   .only-mobile { display: inline; }
